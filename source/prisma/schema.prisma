@@ -1,0 +1,88 @@
+// SQLite by default. To switch to MySQL: change provider to "mysql" and update DATABASE_URL.
+generator client { provider = "prisma-client-js" }
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model CatalogSnapshot {
+  id        String   @id @default(cuid())
+  source    String
+  json      String   // validated Catalog JSON (DbProvider reads the latest)
+  createdAt DateTime @default(now())
+}
+
+/// Admin edits. Never touched by sync. Merged over the provider's data on every read.
+model ProductOverride {
+  productId String   @id
+  json      String   // ProductOverrideSchema
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+model SiteSetting {        // announcements, nav, tabs, banners, promos, flash sale (editable in /admin)
+  key       String   @id
+  json      String
+  updatedAt DateTime @updatedAt
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  source    String   @default("footer")
+  createdAt DateTime @default(now())
+}
+
+model BackInStockRequest {
+  id        String   @id @default(cuid())
+  email     String
+  productId String
+  size      String?
+  createdAt DateTime @default(now())
+  notified  Boolean  @default(false)
+  @@unique([email, productId, size])
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  name      String?
+  phone     String?
+  role      String    @default("customer") // customer | admin
+  addresses Address[]
+  orders    Order[]
+  wishlist  String    @default("[]")        // product ids
+  createdAt DateTime  @default(now())
+}
+
+model Address {
+  id      String @id @default(cuid())
+  userId  String
+  user    User   @relation(fields: [userId], references: [id])
+  label   String @default("Home")
+  name    String
+  phone   String
+  line1   String
+  area    String // Catlog delivery area
+  city    String @default("Lagos")
+}
+
+model Order {
+  id          String   @id // 4AM-XXXXXX
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  email       String?
+  phone       String
+  name        String
+  address     String
+  area        String
+  items       String   // [{productId, size, qty, price}]
+  subtotal    Int
+  delivery    Int      @default(0)
+  currency    String   @default("NGN")
+  payment     String   // paystack | flutterwave | stripe | transfer | whatsapp
+  paymentRef  String?
+  status      String   @default("placed") // placed | paid | confirmed | out_for_delivery | delivered | cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

@@ -1,0 +1,20 @@
+/* Design tokens. Ink/paper sampled from the 4am Catlog logo (#000 + #F4F4F4 sticker outline).
+   Accent #C8382A sampled from the red "4am" signature embroidery on the client's own product photos.
+   Tailwind reads these via tailwind.config.ts → theme.extend.colors. */
+:root {
+  --ink: 11 11 11;        /* #0B0B0B */
+  --paper: 255 255 255;
+  --surface: 242 242 240; /* card image backdrop (4:5) */
+  --surface-2: 233 233 230;
+  --line: 225 225 221;
+  --muted: 106 106 102;
+  --accent: 200 56 42;    /* #C8382A — override in config/site.ts theme.accent */
+  --ok: 30 122 69;
+  --wa: 18 140 74;
+  --radius: 2px;
+  --ease-out: cubic-bezier(.16, 1, .3, 1);
+  --font-sans: 'Archivo', 'Helvetica Neue', Helvetica, Arial, sans-serif; /* headings: wdth 112–118, wght 800–900, uppercase */
+}
+[data-theme='dark'] {
+  --ink: 242 242 239; --paper: 13 13 13; --surface: 24 24 23; --surface-2: 34 34 32; --line: 43 43 41; --muted: 154 154 149;
+}
